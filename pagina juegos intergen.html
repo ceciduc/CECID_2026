@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marcador · LICD Intergen 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0E1626;
+    --panel:#16213A;
+    --panel-2:#1E2C4D;
+    --line:#2A3B63;
+    --text:#EEF1FB;
+    --muted:#93A0C4;
+    --gold:#F2B94D;
+    --gA:#E4572E;
+    --gB:#3AAFA9;
+    --gC:#C74B98;
+    --gD:#6C8EF5;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background: radial-gradient(circle at 15% 0%, rgba(242,185,77,0.08), transparent 40%), var(--bg);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    padding-bottom:50px;
+  }
+  h1,h2,h3,.num{font-family:'Teko',sans-serif; font-weight:600; letter-spacing:0.02em;}
+  header.top{
+    padding:26px 24px 18px;
+    border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg, rgba(30,44,77,0.6), transparent);
+    position:relative;
+  }
+  header.top .eyebrow{color:var(--gold); font-size:12px; text-transform:uppercase; letter-spacing:0.18em; font-weight:600;}
+  header.top h1{font-size:40px; margin:2px 0 4px; line-height:1; padding-right:150px;}
+  header.top p{color:var(--muted); margin:0; font-size:13px; padding-right:150px;}
+  .ig-btn{
+    position:absolute; top:24px; right:24px;
+    display:flex; align-items:center; gap:8px;
+    background:var(--panel-2); border:1px solid var(--line); color:var(--text);
+    text-decoration:none; padding:8px 14px; border-radius:999px; font-size:13px; font-weight:600;
+    transition:border-color 0.15s, transform 0.15s;
+  }
+  .ig-btn:hover{border-color:#E1306C; transform:translateY(-1px);}
+  .ig-btn svg{flex-shrink:0;}
+  @media (max-width:640px){
+    header.top h1, header.top p{padding-right:0;}
+    .ig-btn{position:static; margin-top:14px; width:fit-content;}
+  }
+  .edit-note{
+    background:var(--panel-2); border:1px solid var(--line); border-left:3px solid var(--gold);
+    border-radius:6px; padding:8px 12px; font-size:12px; color:var(--muted); margin-top:12px;
+  }
+  .edit-note code{color:var(--gold);}
+ 
+  main{max-width:980px; margin:0 auto; padding:0 20px;}
+  section{margin-top:32px;}
+  section > h2{font-size:24px; margin:0 0 4px; display:flex; align-items:center; gap:10px;}
+  section > .section-sub{color:var(--muted); font-size:12px; margin:0 0 14px;}
+ 
+  /* Marcador general */
+  .scoreboard{display:grid; grid-template-columns:repeat(4,1fr); gap:12px;}
+  @media (max-width:720px){ .scoreboard{grid-template-columns:repeat(2,1fr);} }
+  .tile{background:var(--panel); border:1px solid var(--line); border-top:4px solid var(--gc); border-radius:10px; padding:12px; text-align:center;}
+  .tile .name{font-size:13px; color:var(--muted); margin-bottom:4px;}
+  .tile .score{font-family:'Teko',sans-serif; font-size:44px; line-height:1; color:var(--gc);}
+ 
+  /* Llaves */
+  .bracket-nav{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:6px;}
+  .nav-btn{background:var(--panel-2); border:1px solid var(--line); color:var(--text); width:38px; height:38px; border-radius:8px; font-size:16px; cursor:pointer;}
+  .nav-btn:hover{border-color:var(--gold); color:var(--gold);}
+  .game-title{text-align:center; flex:1;}
+  .game-title .name{font-size:24px;}
+  .game-title .legend{color:var(--muted); font-size:11px;}
+  .game-dots{display:flex; justify-content:center; gap:6px; margin:6px 0 14px;}
+  .dot{width:7px; height:7px; border-radius:50%; background:var(--line);}
+  .dot.active{background:var(--gold);}
+ 
+  .bracket-scroll{overflow-x:auto; padding-bottom:6px;}
+  .bracket-box{position:relative;}
+  .bkbox{
+    position:absolute; border-radius:8px; border:2px solid var(--bc, var(--line));
+    background:var(--panel); display:flex; flex-direction:column; align-items:center; justify-content:center;
+    font-size:13px; text-align:center; padding:4px 6px;
+  }
+  .bkbox.pendiente{border-style:dashed; color:var(--muted);}
+  .bkbox.ganador{border-color:var(--gold); background:rgba(242,185,77,0.10); box-shadow:0 0 0 1px var(--gold) inset;}
+  .bkbox .pts{font-size:10px; color:var(--muted); margin-top:2px;}
+  .bkbox .tag{font-size:9px; text-transform:uppercase; letter-spacing:0.08em; color:var(--muted); position:absolute; top:-9px; left:8px; background:var(--bg); padding:0 4px;}
+ 
+  .subbracket-label{color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:0.1em; margin:18px 0 6px;}
+ 
+  /* Escondidas */
+  .esc-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+  @media (max-width:640px){ .esc-grid{grid-template-columns:1fr;} }
+  .esc-card{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:14px; text-align:center;}
+  .esc-card .titulo{font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; border-bottom:1px solid var(--line); padding-bottom:8px; margin-bottom:8px;}
+  .esc-card .ganadora{font-size:20px; font-family:'Teko',sans-serif;}
+  .esc-card .ganadora.ninguna{color:var(--muted); font-family:'Inter',sans-serif; font-size:14px;}
+  .esc-card .puntos-nota{color:var(--muted); font-size:11px; margin-top:6px;}
+ 
+  /* Faltas */
+  .faltas-wrap{background:var(--panel); border:1px solid var(--line); border-radius:10px; overflow:hidden;}
+  .faltas-scroll{max-height:210px; overflow-y:auto;}
+  table.faltas{width:100%; border-collapse:collapse; font-size:12px;}
+  table.faltas thead th{
+    position:sticky; top:0; background:var(--panel-2); color:var(--muted);
+    text-align:left; padding:8px 10px; font-weight:600; border-bottom:1px solid var(--line);
+  }
+  table.faltas tbody td{padding:7px 10px; border-bottom:1px solid var(--line);}
+  table.faltas tbody tr:last-child td{border-bottom:none;}
+  table.faltas .pts{text-align:right; font-family:'Teko',sans-serif; font-size:15px;}
+  table.faltas .pts.neg{color:#e05c5c;}
+  table.faltas .pts.pos{color:#7bd88f;}
+  .faltas-empty{padding:16px; text-align:center; color:var(--muted); font-size:12px;}
+ 
+  /* Fotos */
+  .fotos-scroll{
+    overflow-x:auto; overflow-y:hidden;
+  }
+  .fotos-grid{
+    display:grid; grid-auto-flow:column; grid-template-rows:repeat(2,1fr);
+    grid-auto-columns:150px; gap:10px; padding-bottom:8px;
+  }
+  .foto-tile{
+    width:150px; height:110px; border-radius:8px; border:1px solid var(--line); background:var(--panel-2);
+    display:flex; align-items:center; justify-content:center; overflow:hidden; position:relative;
+  }
+  .foto-tile img{width:100%; height:100%; object-fit:cover;}
+  .foto-tile .placeholder-num{font-family:'Teko',sans-serif; font-size:34px; color:var(--muted);}
+  .foto-tile .caption{
+    position:absolute; bottom:0; left:0; right:0; background:rgba(0,0,0,0.55); font-size:10px;
+    padding:3px 6px; color:var(--text);
+  }
+  .fotos-hint{color:var(--muted); font-size:11px; margin-top:6px; text-align:right;}
+ 
+  footer{max-width:980px; margin:36px auto 0; padding:16px 20px; color:var(--muted); font-size:11px; border-top:1px solid var(--line);}
+</style>
+</head>
+<body>
+
+<header class="top"><a class="ig-btn" href="https://www.instagram.com/cecid.uc/" target="_blank" rel="noopener noreferrer">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="2"/>
+      <circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="2"/>
+      <circle cx="17.2" cy="6.8" r="1.2" fill="currentColor"/>
+    </svg>
+    @cecid.uc
+  </a>
+  <div class="eyebrow">LICD · InterGen 2026</div>
+  <h1>Marcador de Juegos Intergeneracionales</h1>
+  <p>Vista de solo lectura para proyectar durante el evento.</p>
+  <p>ignoren que la hicimos con claude😔</p>
+</header>
+
+<main>
+  <section id="scoreboard-section">
+    <h2>Marcador general</h2>
+    <div class="scoreboard" id="scoreboard"></div>
+  </section>
+
+  <section id="bracket-section">
+    <h2>🏆 Llaves por juego</h2>
+    <p class="section-sub">Navega con las flechas. Los cuadros con borde dorado indican el ganador.</p>
+    <div class="bracket-nav">
+      <button class="nav-btn" id="prevGame">◀</button>
+      <div class="game-title">
+        <div class="name" id="gameName"></div>
+        <div class="legend" id="gameLegend"></div>
+      </div>
+      <button class="nav-btn" id="nextGame">▶</button>
+    </div>
+    <div class="game-dots" id="gameDots"></div>
+
+    <div class="bracket-scroll">
+      <div class="bracket-box" id="mainBracket" style="width:650px; height:280px;"></div>
+    </div>
+
+    <div class="subbracket-label">Definición 3er y 4to lugar</div>
+    <div class="bracket-scroll">
+      <div class="bracket-box" id="thirdBracket" style="width:400px; height:150px;"></div>
+    </div>
+  </section>
+
+  <section id="escondidas-section">
+    <h2>🙈 Escondidas</h2>
+    <p class="section-sub">No usa llaves. Ganador de la instancia +100, el resto +40.</p>
+    <div class="esc-grid" id="escondidasGrid"></div>
+  </section>
+
+  <section id="faltas-section">
+    <h2>🚩 Faltas</h2>
+    <p class="section-sub">Tabla con scroll interno. También sirve para bonos manuales (puntos positivos).</p>
+    <div class="faltas-wrap">
+      <div class="faltas-scroll">
+        <table class="faltas">
+          <thead><tr><th>Generación</th><th>Juego</th><th>Motivo</th><th style="text-align:right;">Puntos</th></tr></thead>
+          <tbody id="faltasBody"></tbody>
+        </table>
+        <div class="faltas-empty" id="faltasEmpty" style="display:none;">Sin faltas registradas.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="fotos-section">
+    <h2>📷 Fotos</h2>
+    <p class="section-sub">Galería con scroll horizontal.</p>
+    <div class="fotos-scroll">
+      <div class="fotos-grid" id="fotosGrid"></div>
+    </div>
+    <div class="fotos-hint">← desliza para ver más →</div>
+  </section>
+</main>
+
+<footer>
+  Ultima actualizacion: 26/07/2026 / 15:13
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  const CONFIG = {
+
+    generaciones: [
+      {id:'g2026', nombre:'Gen 2026'},
+      {id:'g2025', nombre:'Gen 2025'},
+      {id:'g2024', nombre:'Gen 2024'},
+      {id:'g2023', nombre:'Gen 2023+'},
+    ],
+
+    juegos: [
+      {
+        key:'lol', nombre:'League of Legends', icono:'🎮',
+        puntos:{ganador:80, empate:40, perdedor:20},
+        llave:{
+          semifinal1:{a:'g2023', b:'g2026', resultado:null},
+          semifinal2:{a:'g2024', b:'g2025', resultado:null},
+          final:{resultado:null},
+          tercerPuesto:{resultado:null},
+        }
+      },
+      {
+        key:'valorant', nombre:'Valorant', icono:'🎯',
+        puntos:{ganador:80, empate:40, perdedor:20},
+        llave:{
+          semifinal1:{a:'g2024', b:'g2025', resultado:null},
+          semifinal2:{a:'g2023', b:'g2026', resultado:null},
+          final:{resultado:null},
+          tercerPuesto:{resultado:null},
+        }
+      },
+      {
+        key:'quemadas', nombre:'Quemadas', icono:'🔴',
+        puntos:{ganador:100, empate:50, perdedor:0},
+        llave:{
+          semifinal1:{a:'g2026', b:'g2023', resultado:null},
+          semifinal2:{a:'g2024', b:'g2025', resultado:null},
+          final:{resultado:null},
+          tercerPuesto:{resultado:null},
+        }
+      },
+      {
+        key:'futbol', nombre:'Fútbol', icono:'⚽',
+        puntos:{ganador:100, empate:50, perdedor:0},
+        llave:{
+          semifinal1:{a:'g2026', b:'g2024', resultado:null},
+          semifinal2:{a:'g2025', b:'g2023', resultado:null},
+          final:{resultado:null},
+          tercerPuesto:{resultado:null},
+        }
+      },
+      {
+        key:'voleibol', nombre:'Voleibol', icono:'🏐',
+        puntos:{ganador:100, empate:50, perdedor:0},
+        llave:{
+          semifinal1:{a:'g2023', b:'g2026', resultado:null},
+          semifinal2:{a:'g2025', b:'g2024', resultado:null},
+          final:{resultado:null},
+          tercerPuesto:{resultado:null},
+        }
+      },
+      {
+        key:'basket', nombre:'Básquetbol', icono:'🏀',
+        puntos:{ganador:100, empate:50, perdedor:0},
+        llave:{
+          semifinal1:{a:'g2024', b:'g2026', resultado:null},
+          semifinal2:{a:'g2025', b:'g2023', resultado:null},
+          final:{resultado:null},
+          tercerPuesto:{resultado:null},
+        }
+      },
+      {
+        key:'mesa', nombre:'Tenis de mesa', icono:'🏓',
+        puntos:{ganador:100, empate:50, perdedor:0},
+        llave:{
+          semifinal1:{a:'g2024', b:'g2025', resultado:null},
+          semifinal2:{a:'g2026', b:'g2023', resultado:null},
+          final:{resultado:null},
+          tercerPuesto:{resultado:null},
+        }
+      },
+    ],
+
+    escondidas: {
+      dia:        {ganador:null},
+      tardeNoche: {ganador:null},
+    },
+
+    faltas: [
+      // Ejemplo — bórralo o edítalo:
+      // {generacion:'g2026', juego:'LOL', motivo:'Insulto por chat', puntos:-10},
+    ],
+
+    fotos: [
+      // Ejemplo — reemplaza src por una URL o base64:
+      // {src:'https://ejemplo.com/foto1.jpg', caption:'Apertura'},
+    ],
+  };
+
+  let currentGameIndex = 0;
+
+  function getGen(id){ return CONFIG.generaciones.find(g => g.id === id); }
+  function genNombre(id){ return id ? getGen(id).nombre : 'Por definir'; }
+  const genColor = (id) => ({g2026:'var(--gA)', g2025:'var(--gB)', g2024:'var(--gC)', g2023:'var(--gD)'}[id] || 'var(--line)');
+
+  function ganadorDeSemi(semi){
+    if (semi.resultado === 'a' || semi.resultado === 'empate-a') return semi.a;
+    if (semi.resultado === 'b' || semi.resultado === 'empate-b') return semi.b;
+    return null;
+  }
+  function perdedorDeSemi(semi){
+    if (semi.resultado === 'a' || semi.resultado === 'empate-a') return semi.b;
+    if (semi.resultado === 'b' || semi.resultado === 'empate-b') return semi.a;
+    return null;
+  }
+  function puntosDeMatch(resultado, puntosGame){
+    if (!resultado) return null;
+    if (resultado === 'a') return {a: puntosGame.ganador, b: puntosGame.perdedor};
+    if (resultado === 'b') return {a: puntosGame.perdedor, b: puntosGame.ganador};
+    if (resultado === 'empate-a' || resultado === 'empate-b') return {a: puntosGame.empate, b: puntosGame.empate};
+    return null;
+  }
+
+  function calcularPuntajes(){
+    const totals = {};
+    CONFIG.generaciones.forEach(g => totals[g.id] = 0);
+
+    CONFIG.juegos.forEach(game => {
+      const b = game.llave;
+      let p = puntosDeMatch(b.semifinal1.resultado, game.puntos);
+      if (p){ totals[b.semifinal1.a] += p.a; totals[b.semifinal1.b] += p.b; }
+
+      p = puntosDeMatch(b.semifinal2.resultado, game.puntos);
+      if (p){ totals[b.semifinal2.a] += p.a; totals[b.semifinal2.b] += p.b; }
+
+      const finA = ganadorDeSemi(b.semifinal1);
+      const finB = ganadorDeSemi(b.semifinal2);
+      p = puntosDeMatch(b.final.resultado, game.puntos);
+      if (p && finA && finB){ totals[finA] += p.a; totals[finB] += p.b; }
+
+      const terA = perdedorDeSemi(b.semifinal1);
+      const terB = perdedorDeSemi(b.semifinal2);
+      p = puntosDeMatch(b.tercerPuesto.resultado, game.puntos);
+      if (p && terA && terB){ totals[terA] += p.a; totals[terB] += p.b; }
+    });
+
+    ['dia','tardeNoche'].forEach(k => {
+      const inst = CONFIG.escondidas[k];
+      if (inst.ganador){
+        CONFIG.generaciones.forEach(g => totals[g.id] += (g.id === inst.ganador ? 100 : 40));
+      }
+    });
+
+    CONFIG.faltas.forEach(f => { totals[f.generacion] += f.puntos; });
+
+    return totals;
+  }
+
+  // ---------- Render: marcador general ----------
+  function renderScoreboard(){
+    const totals = calcularPuntajes();
+    const el = document.getElementById('scoreboard');
+    el.innerHTML = CONFIG.generaciones.map(g => `
+      <div class="tile" style="--gc:${genColor(g.id)}">
+        <div class="name">${g.nombre}</div>
+        <div class="score">${totals[g.id]}</div>
+      </div>
+    `).join('');
+  }
+
+  // ---------- Render: bracket con líneas SVG ----------
+  function box(x,y,w,h,label,sub,color,estado){
+    const cls = estado === 'ganador' ? 'ganador' : (label==='Por definir' ? 'pendiente' : '');
+    return `<div class="bkbox ${cls}" style="left:${x}px; top:${y}px; width:${w}px; height:${h}px; --bc:${color};">
+      <div>${label}</div>${sub?`<div class="pts">${sub}</div>`:''}
+    </div>`;
+  }
+  function svgLine(points, w, h){
+    const d = points.map((p,i) => (i===0?'M':'L') + p[0] + ',' + p[1]).join(' ');
+    return `<svg width="${w}" height="${h}" style="position:absolute; left:0; top:0; pointer-events:none;">
+      <path d="${d}" fill="none" stroke="var(--line)" stroke-width="2"/>
+    </svg>`;
+  }
+
+  function renderMainBracket(game){
+    const b = game.llave;
+    const finA = ganadorDeSemi(b.semifinal1);
+    const finB = ganadorDeSemi(b.semifinal2);
+    // "final.resultado" usa 'a'/'b' genéricos que representan a finA/finB:
+    const finalGanadorId = (() => {
+      if (b.final.resultado === 'a' || b.final.resultado === 'empate-a') return finA;
+      if (b.final.resultado === 'b' || b.final.resultado === 'empate-b') return finB;
+      return null;
+    })();
+
+    let html = '';
+    const lines = [
+      [[150,35],[200,35],[200,70]],
+      [[200,105],[200,70],[250,70]],
+      [[150,175],[200,175],[200,210]],
+      [[200,245],[200,210],[250,210]],
+      [[390,70],[440,70],[440,140]],
+      [[390,210],[440,210],[440,140]],
+      [[440,140],[490,140]],
+    ];
+    html += lines.map(pts => svgLine(pts, 650, 280)).join('');
+
+    html += box(10,10,140,50, genNombre(b.semifinal1.a), null, genColor(b.semifinal1.a), b.semifinal1.resultado==='a'||b.semifinal1.resultado==='empate-a' ? 'ganador':'');
+    html += box(10,80,140,50, genNombre(b.semifinal1.b), null, genColor(b.semifinal1.b), b.semifinal1.resultado==='b'||b.semifinal1.resultado==='empate-b' ? 'ganador':'');
+    html += box(10,150,140,50, genNombre(b.semifinal2.a), null, genColor(b.semifinal2.a), b.semifinal2.resultado==='a'||b.semifinal2.resultado==='empate-a' ? 'ganador':'');
+    html += box(10,220,140,50, genNombre(b.semifinal2.b), null, genColor(b.semifinal2.b), b.semifinal2.resultado==='b'||b.semifinal2.resultado==='empate-b' ? 'ganador':'');
+
+    html += box(250,45,140,50, finA?genNombre(finA):'Por definir', 'Gana semifinal 1', genColor(finA), '');
+    html += box(250,185,140,50, finB?genNombre(finB):'Por definir', 'Gana semifinal 2', genColor(finB), '');
+
+    html += box(490,115,140,50, finalGanadorId?genNombre(finalGanadorId):'Por definir', '🏆 Campeón', genColor(finalGanadorId), finalGanadorId?'ganador':'');
+
+    document.getElementById('mainBracket').innerHTML = html;
+  }
+
+  function renderThirdBracket(game){
+    const b = game.llave;
+    const terA = perdedorDeSemi(b.semifinal1);
+    const terB = perdedorDeSemi(b.semifinal2);
+    const terceroId = (() => {
+      if (b.tercerPuesto.resultado === 'a' || b.tercerPuesto.resultado === 'empate-a') return terA;
+      if (b.tercerPuesto.resultado === 'b' || b.tercerPuesto.resultado === 'empate-b') return terB;
+      return null;
+    })();
+
+    let html = '';
+    const lines = [
+      [[150,35],[200,35],[200,70]],
+      [[200,105],[200,70],[250,70]],
+    ];
+    html += lines.map(pts => svgLine(pts, 400, 150)).join('');
+
+    html += box(10,10,140,50, terA?genNombre(terA):'Por definir', 'Pierde semifinal 1', genColor(terA), b.tercerPuesto.resultado==='a'||b.tercerPuesto.resultado==='empate-a' ? 'ganador':'');
+    html += box(10,80,140,50, terB?genNombre(terB):'Por definir', 'Pierde semifinal 2', genColor(terB), b.tercerPuesto.resultado==='b'||b.tercerPuesto.resultado==='empate-b' ? 'ganador':'');
+    html += box(250,45,140,50, terceroId?genNombre(terceroId):'Por definir', '🥉 3er lugar', genColor(terceroId), terceroId?'ganador':'');
+
+    document.getElementById('thirdBracket').innerHTML = html;
+  }
+
+  function renderBracket(){
+    const game = CONFIG.juegos[currentGameIndex];
+    document.getElementById('gameName').textContent = game.icono + ' ' + game.nombre;
+    document.getElementById('gameLegend').textContent =
+      `Ganador +${game.puntos.ganador} · Empate +${game.puntos.empate} · Perdedor +${game.puntos.perdedor}`;
+    renderMainBracket(game);
+    renderThirdBracket(game);
+  }
+
+  function renderGameDots(){
+    const el = document.getElementById('gameDots');
+    el.innerHTML = CONFIG.juegos.map((g,i) => `<span class="dot ${i===currentGameIndex?'active':''}"></span>`).join('');
+  }
+
+  // ---------- Render: escondidas ----------
+  function renderEscondidas(){
+    const el = document.getElementById('escondidasGrid');
+    const items = [
+      {key:'dia', label:'Instancia Día'},
+      {key:'tardeNoche', label:'Instancia Tarde/Noche'},
+    ];
+    el.innerHTML = items.map(it => {
+      const g = CONFIG.escondidas[it.key].ganador;
+      return `<div class="esc-card">
+        <div class="titulo">${it.label}</div>
+        <div class="ganadora ${g?'':'ninguna'}">${g ? genNombre(g) : 'NINGUNA'}</div>
+        <div class="puntos-nota">Ganador +100 · Resto +40</div>
+      </div>`;
+    }).join('');
+  }
+
+  // ---------- Render: faltas ----------
+  function renderFaltas(){
+    const body = document.getElementById('faltasBody');
+    const empty = document.getElementById('faltasEmpty');
+    if (CONFIG.faltas.length === 0){
+      body.innerHTML = '';
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+    body.innerHTML = CONFIG.faltas.map(f => `
+      <tr>
+        <td>${genNombre(f.generacion)}</td>
+        <td>${f.juego || '—'}</td>
+        <td>${f.motivo || '—'}</td>
+        <td class="pts ${f.puntos < 0 ? 'neg':'pos'}">${f.puntos > 0 ? '+':''}${f.puntos}</td>
+      </tr>
+    `).join('');
+  }
+
+  // ---------- Render: fotos ----------
+  function renderFotos(){
+    const el = document.getElementById('fotosGrid');
+    const fotos = CONFIG.fotos.length ? CONFIG.fotos : Array.from({length:6}, (_,i) => ({src:null, caption:'Foto ' + (i+1)}));
+    el.innerHTML = fotos.map((f) => `
+      <div class="foto-tile">
+        ${f.src
+          ? `<img src="${f.src}" alt="${f.caption||''}">`
+          : `<span class="placeholder-num">${f.caption ? f.caption.replace(/\\D/g,'') : ''}</span>`}
+        ${f.caption ? `<div class="caption">${f.caption}</div>` : ''}
+      </div>
+    `).join('');
+  }
+
+  // ---------- Navegación de juegos (única interacción de la página) ----------
+  document.getElementById('prevGame').addEventListener('click', () => {
+    currentGameIndex = (currentGameIndex - 1 + CONFIG.juegos.length) % CONFIG.juegos.length;
+    renderBracket(); renderGameDots();
+  });
+  document.getElementById('nextGame').addEventListener('click', () => {
+    currentGameIndex = (currentGameIndex + 1) % CONFIG.juegos.length;
+    renderBracket(); renderGameDots();
+  });
+
+  function renderAll(){
+    renderScoreboard();
+    renderBracket();
+    renderGameDots();
+    renderEscondidas();
+    renderFaltas();
+    renderFotos();
+  }
+
+  renderAll();
+})();
+</script>
+</body>
+</html>
