@@ -56,19 +56,19 @@
     border-radius:6px; padding:8px 12px; font-size:12px; color:var(--muted); margin-top:12px;
   }
   .edit-note code{color:var(--gold);}
- 
+
   main{max-width:980px; margin:0 auto; padding:0 20px;}
   section{margin-top:32px;}
   section > h2{font-size:24px; margin:0 0 4px; display:flex; align-items:center; gap:10px;}
   section > .section-sub{color:var(--muted); font-size:12px; margin:0 0 14px;}
- 
+
   /* Marcador general */
   .scoreboard{display:grid; grid-template-columns:repeat(4,1fr); gap:12px;}
   @media (max-width:720px){ .scoreboard{grid-template-columns:repeat(2,1fr);} }
   .tile{background:var(--panel); border:1px solid var(--line); border-top:4px solid var(--gc); border-radius:10px; padding:12px; text-align:center;}
   .tile .name{font-size:13px; color:var(--muted); margin-bottom:4px;}
   .tile .score{font-family:'Teko',sans-serif; font-size:44px; line-height:1; color:var(--gc);}
- 
+
   /* Llaves */
   .bracket-nav{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:6px;}
   .nav-btn{background:var(--panel-2); border:1px solid var(--line); color:var(--text); width:38px; height:38px; border-radius:8px; font-size:16px; cursor:pointer;}
@@ -79,7 +79,7 @@
   .game-dots{display:flex; justify-content:center; gap:6px; margin:6px 0 14px;}
   .dot{width:7px; height:7px; border-radius:50%; background:var(--line);}
   .dot.active{background:var(--gold);}
- 
+
   .bracket-scroll{overflow-x:auto; padding-bottom:6px;}
   .bracket-box{position:relative;}
   .bkbox{
@@ -91,9 +91,45 @@
   .bkbox.ganador{border-color:var(--gold); background:rgba(242,185,77,0.10); box-shadow:0 0 0 1px var(--gold) inset;}
   .bkbox .pts{font-size:10px; color:var(--muted); margin-top:2px;}
   .bkbox .tag{font-size:9px; text-transform:uppercase; letter-spacing:0.08em; color:var(--muted); position:absolute; top:-9px; left:8px; background:var(--bg); padding:0 4px;}
- 
+
   .subbracket-label{color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:0.1em; margin:18px 0 6px;}
- 
+
+  /* Liguilla (todos contra todos, sin llaves) */
+  .liguilla-scroll{max-height:340px; overflow-y:auto; padding-right:4px;}
+  .liguilla-nota{
+    background:var(--panel-2); border:1px solid var(--line); border-left:3px solid var(--gold);
+    border-radius:6px; padding:8px 12px; font-size:12px; color:var(--muted); margin-bottom:12px;
+  }
+  .cruce-card{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:12px; margin-bottom:10px;}
+  .cruce-header{display:flex; align-items:center; justify-content:center; gap:10px; font-size:15px; margin-bottom:10px;}
+  .cruce-header .vs{color:var(--muted); font-size:11px;}
+  .cruce-header .eq{display:flex; align-items:center; gap:6px;}
+  .cruce-header .dot{width:10px; height:10px; border-radius:50%;}
+  .partidos-row{display:flex; gap:8px; flex-wrap:wrap; justify-content:center;}
+  .partido-pill{
+    flex:1; min-width:110px; max-width:160px; text-align:center; border-radius:8px; padding:7px 8px;
+    border:2px solid var(--line); background:var(--panel-2); font-size:12px;
+  }
+  .partido-pill .num{color:var(--muted); font-size:10px; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:3px;}
+  .partido-pill .res{font-family:'Teko',sans-serif; font-size:16px;}
+  .partido-pill.pendiente{border-style:dashed; color:var(--muted);}
+  .partido-pill.pendiente .res{color:var(--muted); font-family:'Inter',sans-serif; font-size:11px;}
+  .partido-pill.gana-a{border-color:var(--bcA, var(--gold));}
+  .partido-pill.gana-b{border-color:var(--bcB, var(--gold));}
+  .partido-pill.empate{border-color:var(--muted);}
+  .cruce-subtotal{margin-top:8px; text-align:center; font-size:11px; color:var(--muted);}
+
+  /* Lugares / bonificación */
+  .lugares-row{display:flex; gap:8px; flex-wrap:wrap;}
+  .lugar-pill{
+    flex:1; min-width:130px; background:var(--panel); border:1px solid var(--line); border-radius:10px;
+    padding:8px 10px; text-align:center; border-top:3px solid var(--lc, var(--line));
+  }
+  .lugar-pill .medal{font-size:16px;}
+  .lugar-pill .gen{font-size:13px; margin:2px 0;}
+  .lugar-pill .gen.pendiente{color:var(--muted); font-style:italic;}
+  .lugar-pill .bono{font-family:'Teko',sans-serif; font-size:18px; color:var(--gold);}
+
   /* Escondidas */
   .esc-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
   @media (max-width:640px){ .esc-grid{grid-template-columns:1fr;} }
@@ -102,7 +138,7 @@
   .esc-card .ganadora{font-size:20px; font-family:'Teko',sans-serif;}
   .esc-card .ganadora.ninguna{color:var(--muted); font-family:'Inter',sans-serif; font-size:14px;}
   .esc-card .puntos-nota{color:var(--muted); font-size:11px; margin-top:6px;}
- 
+
   /* Faltas */
   .faltas-wrap{background:var(--panel); border:1px solid var(--line); border-radius:10px; overflow:hidden;}
   .faltas-scroll{max-height:210px; overflow-y:auto;}
@@ -117,7 +153,7 @@
   table.faltas .pts.neg{color:#e05c5c;}
   table.faltas .pts.pos{color:#7bd88f;}
   .faltas-empty{padding:16px; text-align:center; color:var(--muted); font-size:12px;}
- 
+
   /* Fotos */
   .fotos-scroll{
     overflow-x:auto; overflow-y:hidden;
@@ -137,13 +173,14 @@
     padding:3px 6px; color:var(--text);
   }
   .fotos-hint{color:var(--muted); font-size:11px; margin-top:6px; text-align:right;}
- 
+
   footer{max-width:980px; margin:36px auto 0; padding:16px 20px; color:var(--muted); font-size:11px; border-top:1px solid var(--line);}
 </style>
 </head>
 <body>
 
-<header class="top"><a class="ig-btn" href="https://www.instagram.com/cecid.uc/" target="_blank" rel="noopener noreferrer">
+<header class="top">
+  <a class="ig-btn" href="https://www.instagram.com/cecid.uc/" target="_blank" rel="noopener noreferrer">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="2"/>
       <circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="2"/>
@@ -154,7 +191,10 @@
   <div class="eyebrow">LICD · InterGen 2026</div>
   <h1>Marcador de Juegos Intergeneracionales</h1>
   <p>Vista de solo lectura para proyectar durante el evento.</p>
-  <p>ignoren que la hicimos con claude😔</p>
+  <div class="edit-note">
+    Este marcador no tiene botones para cambiar resultados. Todo se edita abriendo el archivo
+    y modificando el objeto <code>CONFIG</code> al inicio del <code>&lt;script&gt;</code>.
+  </div>
 </header>
 
 <main>
@@ -164,8 +204,8 @@
   </section>
 
   <section id="bracket-section">
-    <h2>🏆 Llaves por juego</h2>
-    <p class="section-sub">Navega con las flechas. Los cuadros con borde dorado indican el ganador.</p>
+    <h2>🏆 Llaves / partidas por juego</h2>
+    <p class="section-sub" id="sectionSub">Navega con las flechas. Los cuadros con borde dorado indican el ganador.</p>
     <div class="bracket-nav">
       <button class="nav-btn" id="prevGame">◀</button>
       <div class="game-title">
@@ -176,14 +216,23 @@
     </div>
     <div class="game-dots" id="gameDots"></div>
 
-    <div class="bracket-scroll">
-      <div class="bracket-box" id="mainBracket" style="width:650px; height:280px;"></div>
+    <div id="bracketContainer">
+      <div class="bracket-scroll">
+        <div class="bracket-box" id="mainBracket" style="width:650px; height:280px;"></div>
+      </div>
+
+      <div class="subbracket-label">Definición 3er y 4to lugar</div>
+      <div class="bracket-scroll">
+        <div class="bracket-box" id="thirdBracket" style="width:400px; height:150px;"></div>
+      </div>
     </div>
 
-    <div class="subbracket-label">Definición 3er y 4to lugar</div>
-    <div class="bracket-scroll">
-      <div class="bracket-box" id="thirdBracket" style="width:400px; height:150px;"></div>
+    <div id="liguillaContainer" class="liguilla-scroll">
+      <div id="liguillaBody"></div>
     </div>
+
+    <div class="subbracket-label">🏅 Lugares y bonificación (1° +30 · 2° +20 · 3° +10 · 4° +0)</div>
+    <div id="lugaresRow" class="lugares-row"></div>
   </section>
 
   <section id="escondidas-section">
@@ -217,14 +266,71 @@
 </main>
 
 <footer>
-  Ultima actualizacion: 26/07/2026 / 15:13
+  Basado en <em>Juegos_LICD_InterGen2026.pdf</em>. Última edición de esta plantilla: julio 2026.
 </footer>
 
 <script>
 (function(){
   "use strict";
 
+  // ======================================================================
+  // CONFIG — ÚNICO LUGAR PARA MODIFICAR RESULTADOS, PUNTAJES Y CONTENIDO.
+  // No hay botones en la página: todo cambio se hace editando este objeto.
+  // ======================================================================
+  //
+  // GENERACIONES: agrega/quita/renombra aquí. El "id" se usa como referencia
+  // en el resto del CONFIG, así que si lo cambias, actualízalo en todos lados.
+  //
+  // CADA JUEGO PUEDE SER DE DOS TIPOS ("tipo"):
+  //
+  //   tipo:'llave' (o sin "tipo", es el valor por defecto) -> semifinales + final
+  //   + 3er puesto. resultado puede ser:
+  //     'a'          -> gana el equipo "a" de ese cruce
+  //     'b'          -> gana el equipo "b" de ese cruce
+  //     'empate-a'   -> empate, pero avanza el equipo "a" (ambos reciben puntos de empate)
+  //     'empate-b'   -> empate, pero avanza el equipo "b"
+  //     null         -> partido no jugado todavía
+  //   En "final" y "tercerPuesto", "a" siempre corresponde al ganador/perdedor
+  //   de semifinal1, y "b" al de semifinal2 (se calculan solos, no los edites).
+  //
+  //   tipo:'liguilla' -> todos contra todos (se usa cuando falta una generación
+  //   completa y no alcanza para armar una llave de 4). Se define en
+  //   "liguilla.cruces": cada cruce es un par de generaciones que juegan
+  //   "partidosPorCruce" partidas entre sí. El array "resultados" tiene un
+  //   valor por cada partida jugada, y cada valor puede ser:
+  //     'a'        -> gana el equipo "a" esa partida
+  //     'b'        -> gana el equipo "b" esa partida
+  //     'empate'   -> empate esa partida (ambos reciben puntos de empate)
+  //     null       -> partida no jugada todavía
+  //   Para agregar/quitar cruces o cambiar la cantidad de partidas, edita
+  //   el array "cruces" y "partidosPorCruce" directamente.
+  //
+  // BONO POR LUGAR ("bonoLugares" + "lugares" de cada juego): además de los
+  // puntos por partido, el PDF da un bono por el puesto final en cada juego
+  // (menos Escondidas): 1° +30, 2° +20, 3° +10, 4° +0.
+  //   - En juegos con "llave" se calcula solo (1°/2° salen de la final,
+  //     3°/4° del partido por el 3er puesto). No hay que tocar nada.
+  //   - En juegos de "liguilla" (como LOL) no existe un partido final que
+  //     defina el podio, así que hay que completar "liguilla.lugares" a
+  //     mano con el "id" de la generación en cada puesto cuando se termine
+  //     de jugar (o dejarlo en null mientras tanto).
+  //
+  // ESCONDIDAS: pon el "id" de la generación ganadora en cada instancia, o
+  // null si todavía no se juega.
+  //
+  // FALTAS: agrega una fila por cada falta (puntos negativos) o bono
+  // (puntos positivos). El motivo es texto libre.
+  //
+  // FOTOS: "src" puede ser una URL o una imagen en base64. Si lo dejas en
+  // null se muestra un cuadro numerado de relleno (como en el boceto).
+
   const CONFIG = {
+
+    // Bonificación por puesto general, según el PDF (no aplica a Escondidas).
+    // En juegos con llave se calcula solo, con el resultado de la final y el
+    // 3er puesto. En juegos de liguilla (como LOL) no hay podio automático,
+    // así que hay que indicarlo a mano más abajo en "liguilla.lugares".
+    bonoLugares: {primero:30, segundo:20, tercero:10, cuarto:0},
 
     generaciones: [
       {id:'g2026', nombre:'Gen 2026'},
@@ -236,12 +342,18 @@
     juegos: [
       {
         key:'lol', nombre:'League of Legends', icono:'🎮',
+        tipo:'liguilla', // no hay llaves: falta una generación completa, se juega todos contra todos
         puntos:{ganador:80, empate:40, perdedor:20},
-        llave:{
-          semifinal1:{a:'g2023', b:'g2026', resultado:null},
-          semifinal2:{a:'g2024', b:'g2025', resultado:null},
-          final:{resultado:null},
-          tercerPuesto:{resultado:null},
+        liguilla:{
+          partidosPorCruce: 3,
+          cruces:[
+            {a:'g2024', b:'g2025', resultados:[null,null,null]},
+            {a:'g2024', b:'g2023', resultados:[null,null,null]},
+            {a:'g2023', b:'g2025', resultados:[null,null,null]},
+          ],
+          // Solo 3 generaciones juegan LOL, así que no hay "cuarto" lugar.
+          // Ponlo tú a mano cuando se terminen los cruces (id o null).
+          lugares:{primero:null, segundo:null, tercero:null},
         }
       },
       {
@@ -249,7 +361,7 @@
         puntos:{ganador:80, empate:40, perdedor:20},
         llave:{
           semifinal1:{a:'g2024', b:'g2025', resultado:null},
-          semifinal2:{a:'g2023', b:'g2026', resultado:null},
+          semifinal2:{a:'g2023', b:'g2026', resultado:'a'},
           final:{resultado:null},
           tercerPuesto:{resultado:null},
         }
@@ -322,6 +434,11 @@
     ],
   };
 
+  // ======================================================================
+  // A partir de aquí es solo lógica de cálculo y dibujo. No hace falta
+  // tocar nada más abajo de esta línea para usar el marcador.
+  // ======================================================================
+
   let currentGameIndex = 0;
 
   function getGen(id){ return CONFIG.generaciones.find(g => g.id === id); }
@@ -342,8 +459,32 @@
     if (!resultado) return null;
     if (resultado === 'a') return {a: puntosGame.ganador, b: puntosGame.perdedor};
     if (resultado === 'b') return {a: puntosGame.perdedor, b: puntosGame.ganador};
-    if (resultado === 'empate-a' || resultado === 'empate-b') return {a: puntosGame.empate, b: puntosGame.empate};
+    if (resultado === 'empate-a' || resultado === 'empate-b' || resultado === 'empate') return {a: puntosGame.empate, b: puntosGame.empate};
     return null;
+  }
+  // Dado un partido genérico (final o tercerPuesto) y los ids que ocupan
+  // los slots "a"/"b", devuelve quién ganó y quién perdió ese partido.
+  function resultadoGenerico(match, idA, idB){
+    if (!idA || !idB) return {ganador:null, perdedor:null};
+    if (match.resultado === 'a' || match.resultado === 'empate-a') return {ganador:idA, perdedor:idB};
+    if (match.resultado === 'b' || match.resultado === 'empate-b') return {ganador:idB, perdedor:idA};
+    return {ganador:null, perdedor:null};
+  }
+
+  // Calcula el podio (1°-4°) de un juego, según su tipo.
+  function calcularLugares(game){
+    if (game.tipo === 'liguilla'){
+      const l = game.liguilla.lugares || {};
+      return {primero:l.primero||null, segundo:l.segundo||null, tercero:l.tercero||null, cuarto:l.cuarto||null};
+    }
+    const b = game.llave;
+    const finA = ganadorDeSemi(b.semifinal1);
+    const finB = ganadorDeSemi(b.semifinal2);
+    const rFinal = resultadoGenerico(b.final, finA, finB);
+    const terA = perdedorDeSemi(b.semifinal1);
+    const terB = perdedorDeSemi(b.semifinal2);
+    const rTercer = resultadoGenerico(b.tercerPuesto, terA, terB);
+    return {primero:rFinal.ganador, segundo:rFinal.perdedor, tercero:rTercer.ganador, cuarto:rTercer.perdedor};
   }
 
   function calcularPuntajes(){
@@ -351,22 +492,39 @@
     CONFIG.generaciones.forEach(g => totals[g.id] = 0);
 
     CONFIG.juegos.forEach(game => {
-      const b = game.llave;
-      let p = puntosDeMatch(b.semifinal1.resultado, game.puntos);
-      if (p){ totals[b.semifinal1.a] += p.a; totals[b.semifinal1.b] += p.b; }
+      if (game.tipo === 'liguilla'){
+        game.liguilla.cruces.forEach(cruce => {
+          cruce.resultados.forEach(resultado => {
+            const p = puntosDeMatch(resultado, game.puntos);
+            if (p){ totals[cruce.a] += p.a; totals[cruce.b] += p.b; }
+          });
+        });
+      } else {
+        const b = game.llave;
+        let p = puntosDeMatch(b.semifinal1.resultado, game.puntos);
+        if (p){ totals[b.semifinal1.a] += p.a; totals[b.semifinal1.b] += p.b; }
 
-      p = puntosDeMatch(b.semifinal2.resultado, game.puntos);
-      if (p){ totals[b.semifinal2.a] += p.a; totals[b.semifinal2.b] += p.b; }
+        p = puntosDeMatch(b.semifinal2.resultado, game.puntos);
+        if (p){ totals[b.semifinal2.a] += p.a; totals[b.semifinal2.b] += p.b; }
 
-      const finA = ganadorDeSemi(b.semifinal1);
-      const finB = ganadorDeSemi(b.semifinal2);
-      p = puntosDeMatch(b.final.resultado, game.puntos);
-      if (p && finA && finB){ totals[finA] += p.a; totals[finB] += p.b; }
+        const finA = ganadorDeSemi(b.semifinal1);
+        const finB = ganadorDeSemi(b.semifinal2);
+        p = puntosDeMatch(b.final.resultado, game.puntos);
+        if (p && finA && finB){ totals[finA] += p.a; totals[finB] += p.b; }
 
-      const terA = perdedorDeSemi(b.semifinal1);
-      const terB = perdedorDeSemi(b.semifinal2);
-      p = puntosDeMatch(b.tercerPuesto.resultado, game.puntos);
-      if (p && terA && terB){ totals[terA] += p.a; totals[terB] += p.b; }
+        const terA = perdedorDeSemi(b.semifinal1);
+        const terB = perdedorDeSemi(b.semifinal2);
+        p = puntosDeMatch(b.tercerPuesto.resultado, game.puntos);
+        if (p && terA && terB){ totals[terA] += p.a; totals[terB] += p.b; }
+      }
+
+      // Bono por lugar (no aplica a Escondidas, que no está en CONFIG.juegos)
+      const lugares = calcularLugares(game);
+      const bono = CONFIG.bonoLugares;
+      if (lugares.primero) totals[lugares.primero] += bono.primero;
+      if (lugares.segundo) totals[lugares.segundo] += bono.segundo;
+      if (lugares.tercero) totals[lugares.tercero] += bono.tercero;
+      if (lugares.cuarto) totals[lugares.cuarto] += bono.cuarto;
     });
 
     ['dia','tardeNoche'].forEach(k => {
@@ -467,13 +625,90 @@
     document.getElementById('thirdBracket').innerHTML = html;
   }
 
+  function renderLiguilla(game){
+    const lig = game.liguilla;
+    let html = `<div class="liguilla-nota">Se juega todos contra todos (sin llaves): falta una generación completa. Cada cruce tiene ${lig.partidosPorCruce} partida(s).</div>`;
+
+    lig.cruces.forEach(cruce => {
+      html += `<div class="cruce-card">
+        <div class="cruce-header">
+          <span class="eq"><span class="dot" style="background:${genColor(cruce.a)}"></span>${genNombre(cruce.a)}</span>
+          <span class="vs">VS</span>
+          <span class="eq"><span class="dot" style="background:${genColor(cruce.b)}"></span>${genNombre(cruce.b)}</span>
+        </div>
+        <div class="partidos-row">`;
+
+      for (let i = 0; i < lig.partidosPorCruce; i++){
+        const r = cruce.resultados[i];
+        let claseR = 'pendiente', texto = 'Pendiente';
+        if (r === 'a'){ claseR = 'gana-a'; texto = 'Gana ' + genNombre(cruce.a); }
+        else if (r === 'b'){ claseR = 'gana-b'; texto = 'Gana ' + genNombre(cruce.b); }
+        else if (r === 'empate'){ claseR = 'empate'; texto = 'Empate'; }
+        html += `<div class="partido-pill ${claseR}" style="--bcA:${genColor(cruce.a)}; --bcB:${genColor(cruce.b)};">
+          <div class="num">Partida ${i+1}</div>
+          <div class="res">${texto}</div>
+        </div>`;
+      }
+
+      // Subtotal de puntos de este cruce (solo informativo)
+      let ptsA = 0, ptsB = 0;
+      cruce.resultados.forEach(r => {
+        const p = puntosDeMatch(r, game.puntos);
+        if (p){ ptsA += p.a; ptsB += p.b; }
+      });
+      html += `</div><div class="cruce-subtotal">${genNombre(cruce.a)}: ${ptsA} pts &nbsp;·&nbsp; ${genNombre(cruce.b)}: ${ptsB} pts</div></div>`;
+    });
+
+    document.getElementById('liguillaBody').innerHTML = html;
+  }
+
+  function renderLugares(game){
+    const lugares = calcularLugares(game);
+    const puestos = [
+      {key:'primero', medal:'🥇', bono:CONFIG.bonoLugares.primero},
+      {key:'segundo', medal:'🥈', bono:CONFIG.bonoLugares.segundo},
+      {key:'tercero', medal:'🥉', bono:CONFIG.bonoLugares.tercero},
+      {key:'cuarto',  medal:'4️⃣', bono:CONFIG.bonoLugares.cuarto},
+    ];
+    // Si el juego es liguilla y solo tiene 3 generaciones en juego, no mostramos
+    // el cuarto puesto (no hay una cuarta generación participando en ese juego).
+    const generacionesEnJuego = game.tipo === 'liguilla'
+      ? new Set(game.liguilla.cruces.flatMap(c => [c.a, c.b]))
+      : null;
+    const puestosAMostrar = (game.tipo === 'liguilla' && generacionesEnJuego.size < 4)
+      ? puestos.slice(0, generacionesEnJuego.size)
+      : puestos;
+
+    document.getElementById('lugaresRow').innerHTML = puestosAMostrar.map(p => {
+      const genId = lugares[p.key];
+      return `<div class="lugar-pill" style="--lc:${genColor(genId)}">
+        <div class="medal">${p.medal}</div>
+        <div class="gen ${genId?'':'pendiente'}">${genId ? genNombre(genId) : 'Por definir'}</div>
+        <div class="bono">+${p.bono}</div>
+      </div>`;
+    }).join('');
+  }
+
   function renderBracket(){
     const game = CONFIG.juegos[currentGameIndex];
     document.getElementById('gameName').textContent = game.icono + ' ' + game.nombre;
     document.getElementById('gameLegend').textContent =
       `Ganador +${game.puntos.ganador} · Empate +${game.puntos.empate} · Perdedor +${game.puntos.perdedor}`;
-    renderMainBracket(game);
-    renderThirdBracket(game);
+
+    const esLiguilla = game.tipo === 'liguilla';
+    document.getElementById('bracketContainer').style.display = esLiguilla ? 'none' : 'block';
+    document.getElementById('liguillaContainer').style.display = esLiguilla ? 'block' : 'none';
+    document.getElementById('sectionSub').textContent = esLiguilla
+      ? 'Este juego se define todos contra todos, sin llaves.'
+      : 'Navega con las flechas. Los cuadros con borde dorado indican el ganador.';
+
+    if (esLiguilla){
+      renderLiguilla(game);
+    } else {
+      renderMainBracket(game);
+      renderThirdBracket(game);
+    }
+    renderLugares(game);
   }
 
   function renderGameDots(){
