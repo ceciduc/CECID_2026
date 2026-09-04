@@ -139,6 +139,9 @@
   .esc-card .ganadora.ninguna{color:var(--muted); font-family:'Inter',sans-serif; font-size:14px;}
   .esc-card .puntos-nota{color:var(--muted); font-size:11px; margin-top:6px;}
 
+  /* Mini juegos extra */
+  .mini-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(160px,1fr)); gap:14px;}
+
   /* Faltas */
   .faltas-wrap{background:var(--panel); border:1px solid var(--line); border-radius:10px; overflow:hidden;}
   .faltas-scroll{max-height:210px; overflow-y:auto;}
@@ -240,6 +243,12 @@
     <div class="esc-grid" id="escondidasGrid"></div>
   </section>
 
+  <section id="minijuegos-section">
+    <h2>🎲 Mini juegos extra</h2>
+    <p class="section-sub">Cada mini juego suma sus puntos solo a la generación ganadora.</p>
+    <div class="mini-grid" id="minijuegosGrid"></div>
+  </section>
+
   <section id="faltas-section">
     <h2>🚩 Faltas</h2>
     <p class="section-sub">Tabla con scroll interno. También sirve para bonos manuales (puntos positivos).</p>
@@ -317,6 +326,11 @@
   // ESCONDIDAS: pon el "id" de la generación ganadora en cada instancia, o
   // null si todavía no se juega.
   //
+  // MINI JUEGOS: lista libre, agrega uno por cada mini juego jugado con
+  // {nombre, puntos, ganador}. El "ganador" se lleva "puntos" completos;
+  // el resto de generaciones no suma nada por ese mini juego. Deja
+  // "ganador:null" si todavía no se juega.
+  //
   // FALTAS: agrega una fila por cada falta (puntos negativos) o bono
   // (puntos positivos). El motivo es texto libre.
   //
@@ -368,7 +382,7 @@
       {
         key:'quemadas', nombre:'Quemadas', icono:'🔴',
         tipo:'liguilla', // no hay llaves: falta una generación completa, se juega todos contra todos
-        puntos:{ganador:0, empate:0, perdedor:0},
+        puntos:{ganador:100, empate:50, perdedor:0},
         liguilla:{
           partidosPorCruce: 1,
           cruces:[
@@ -383,7 +397,7 @@
       {
         key:'futbol', nombre:'Fútbol', icono:'⚽',
          tipo:'liguilla', // no hay llaves: falta una generación completa, se juega todos contra todos
-        puntos:{ganador:0, empate:0, perdedor:0},
+        puntos:{ganador:100, empate:50, perdedor:0},
         liguilla:{
           partidosPorCruce: 1,
           cruces:[
@@ -398,7 +412,7 @@
       {
         key:'voleibol', nombre:'Voleibol', icono:'🏐',
          tipo:'liguilla', // no hay llaves: falta una generación completa, se juega todos contra todos
-        puntos:{ganador:0, empate:0, perdedor:0},
+        puntos:{ganador:100, empate:50, perdedor:0},
         liguilla:{
           partidosPorCruce: 2,
           cruces:[
@@ -426,6 +440,17 @@
       dia:        {ganador:null},
       tardeNoche: {ganador:null},
     },
+
+    minijuegos: [
+      {nombre:'Busqueda Miembro Cecid (Lucas)', puntos:50, ganador:'g2026'},
+      {nombre:'Busqueda Miembro Cecid (Isi)', puntos:50, ganador:'g2026'},
+      {nombre:'Busqueda Miembro Cecid (Anto)', puntos:50, ganador:'g2023'},
+      {nombre:'Busqueda Miembro Cecid (Gorrito1)', puntos:50, ganador:'g2026'},
+      {nombre:'Busqueda Miembro Cecid (Gorrito2)', puntos:50, ganador:'g2024'},
+      {nombre:'Payas', puntos:50, ganador:'g2024'}
+      // Ejemplo — bórralo o edítalo y agrega los que quieras:
+      // {nombre:'Trivia musical', puntos:50, ganador:'g2026'},
+    ],
 
     faltas: [
       // Ejemplo — bórralo o edítalo:
@@ -536,6 +561,10 @@
       if (inst.ganador){
         CONFIG.generaciones.forEach(g => totals[g.id] += (g.id === inst.ganador ? 100 : 40));
       }
+    });
+
+    CONFIG.minijuegos.forEach(mj => {
+      if (mj.ganador) totals[mj.ganador] += mj.puntos;
     });
 
     CONFIG.faltas.forEach(f => { totals[f.generacion] += f.puntos; });
@@ -737,6 +766,22 @@
     }).join('');
   }
 
+  // ---------- Render: mini juegos ----------
+  function renderMinijuegos(){
+    const el = document.getElementById('minijuegosGrid');
+    if (!CONFIG.minijuegos.length){
+      el.innerHTML = `<div class="esc-card"><div class="ganadora ninguna">Sin mini juegos registrados todavía.</div></div>`;
+      return;
+    }
+    el.innerHTML = CONFIG.minijuegos.map(mj => `
+      <div class="esc-card">
+        <div class="titulo">${mj.nombre}</div>
+        <div class="ganadora ${mj.ganador?'':'ninguna'}">${mj.ganador ? genNombre(mj.ganador) : 'Pendiente'}</div>
+        <div class="puntos-nota">+${mj.puntos} pts al ganador</div>
+      </div>
+    `).join('');
+  }
+
   // ---------- Render: faltas ----------
   function renderFaltas(){
     const body = document.getElementById('faltasBody');
@@ -786,6 +831,7 @@
     renderBracket();
     renderGameDots();
     renderEscondidas();
+    renderMinijuegos();
     renderFaltas();
     renderFotos();
   }
