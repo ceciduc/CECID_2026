@@ -367,52 +367,57 @@
       },
       {
         key:'quemadas', nombre:'Quemadas', icono:'🔴',
-        puntos:{ganador:100, empate:50, perdedor:0},
-        llave:{
-          semifinal1:{a:'g2026', b:'g2023', resultado:null},
-          semifinal2:{a:'g2024', b:'g2025', resultado:null},
-          final:{resultado:null},
-          tercerPuesto:{resultado:null},
+        tipo:'liguilla', // no hay llaves: falta una generación completa, se juega todos contra todos
+        puntos:{ganador:0, empate:0, perdedor:0},
+        liguilla:{
+          partidosPorCruce: 1,
+          cruces:[
+            {a:'g2024', b:'g2025', resultados:['b']},
+            {a:'g2026', b:'g2025', resultados:['b']},
+            {a:'g2026', b:'g2024', resultados:['b']},
+          ],
+          
+          lugares:{primero:'g2025', segundo:'g2024', tercero:'g2026'},
         }
       },
       {
         key:'futbol', nombre:'Fútbol', icono:'⚽',
-        puntos:{ganador:100, empate:50, perdedor:0},
-        llave:{
-          semifinal1:{a:'g2026', b:'g2024', resultado:null},
-          semifinal2:{a:'g2025', b:'g2023', resultado:null},
-          final:{resultado:null},
-          tercerPuesto:{resultado:null},
+         tipo:'liguilla', // no hay llaves: falta una generación completa, se juega todos contra todos
+        puntos:{ganador:0, empate:0, perdedor:0},
+        liguilla:{
+          partidosPorCruce: 1,
+          cruces:[
+            {a:'g2024', b:'g2026', resultados:['a']},
+            {a:'g2024', b:'g2025', resultados:['a']},
+            {a:'g2026', b:'g2025', resultados:['a']},
+          ],
+          
+          lugares:{primero:'g2024', segundo:'g2026', tercero:'g2025'},
         }
       },
       {
         key:'voleibol', nombre:'Voleibol', icono:'🏐',
-        puntos:{ganador:100, empate:50, perdedor:0},
-        llave:{
-          semifinal1:{a:'g2023', b:'g2026', resultado:null},
-          semifinal2:{a:'g2025', b:'g2024', resultado:null},
-          final:{resultado:null},
-          tercerPuesto:{resultado:null},
-        }
-      },
-      {
-        key:'basket', nombre:'Básquetbol', icono:'🏀',
-        puntos:{ganador:100, empate:50, perdedor:0},
-        llave:{
-          semifinal1:{a:'g2024', b:'g2026', resultado:null},
-          semifinal2:{a:'g2025', b:'g2023', resultado:null},
-          final:{resultado:null},
-          tercerPuesto:{resultado:null},
+         tipo:'liguilla', // no hay llaves: falta una generación completa, se juega todos contra todos
+        puntos:{ganador:0, empate:0, perdedor:0},
+        liguilla:{
+          partidosPorCruce: 2,
+          cruces:[
+            {a:'g2024', b:'g2025', resultados:['b','b']},
+          
+            
+          ],
+          
+          lugares:{primero:'g2025', segundo:'g2026'},
         }
       },
       {
         key:'mesa', nombre:'Tenis de mesa', icono:'🏓',
         puntos:{ganador:100, empate:50, perdedor:0},
         llave:{
-          semifinal1:{a:'g2024', b:'g2025', resultado:null},
-          semifinal2:{a:'g2026', b:'g2023', resultado:null},
-          final:{resultado:null},
-          tercerPuesto:{resultado:null},
+          semifinal1:{a:'g2024', b:'g2025', resultado:'b'},
+          semifinal2:{a:'g2026', b:'g2023', resultado:'a'},
+          final:{resultado:'b'},
+          tercerPuesto:{resultado:'b'},
         }
       },
     ],
