@@ -287,90 +287,8 @@
 (function(){
   "use strict";
 
-  // ======================================================================
-  // CONFIG — ÚNICO LUGAR PARA MODIFICAR RESULTADOS, PUNTAJES Y CONTENIDO.
-  // No hay botones en la página: todo cambio se hace editando este objeto.
-  // ======================================================================
-  //
-  // GENERACIONES: agrega/quita/renombra aquí. El "id" se usa como referencia
-  // en el resto del CONFIG, así que si lo cambias, actualízalo en todos lados.
-  //
-  // CADA JUEGO PUEDE SER DE DOS TIPOS ("tipo"):
-  //
-  //   tipo:'llave' (o sin "tipo", es el valor por defecto) -> semifinales + final
-  //   + 3er puesto. resultado puede ser:
-  //     'a'          -> gana el equipo "a" de ese cruce
-  //     'b'          -> gana el equipo "b" de ese cruce
-  //     'empate-a'   -> empate, pero avanza el equipo "a" (ambos reciben puntos de empate)
-  //     'empate-b'   -> empate, pero avanza el equipo "b"
-  //     null         -> partido no jugado todavía
-  //   En "final" y "tercerPuesto", "a" siempre corresponde al ganador/perdedor
-  //   de semifinal1, y "b" al de semifinal2 (se calculan solos, no los edites).
-  //
-  //   tipo:'liguilla' -> todos contra todos (se usa cuando falta una generación
-  //   completa y no alcanza para armar una llave de 4). Se define en
-  //   "liguilla.cruces": cada cruce es un par de generaciones que juegan
-  //   "partidosPorCruce" partidas entre sí. El array "resultados" tiene un
-  //   valor por cada partida jugada, y cada valor puede ser:
-  //     'a'        -> gana el equipo "a" esa partida
-  //     'b'        -> gana el equipo "b" esa partida
-  //     'empate'   -> empate esa partida (ambos reciben puntos de empate)
-  //     null       -> partida no jugada todavía
-  //   Para agregar/quitar cruces o cambiar la cantidad de partidas, edita
-  //   el array "cruces" y "partidosPorCruce" directamente.
-  //
-  //   IMPORTANTE (acuerdo del consejo): en los juegos deportivos (los que
-  //   antes daban 0 por perder) ahora perder da 20% del puntaje del ganador,
-  //   igual que ya pasaba en los juegos online (LOL/Valorant). Por eso
-  //   Quemadas, Fútbol, Voleibol y Tenis de mesa ahora tienen
-  //   "perdedor:20" (20% de 100) en vez de 0.
-  //
-  // BONO POR LUGAR ("bonoLugares" + "lugares" de cada juego): además de los
-  // puntos por partido, el PDF da un bono por el puesto final en cada juego
-  // (menos Escondidas): 1° +30, 2° +20, 3° +10, 4° +0.
-  //   - En juegos con "llave" se calcula solo (1°/2° salen de la final,
-  //     3°/4° del partido por el 3er puesto). No hay que tocar nada.
-  //   - En juegos de "liguilla" (como LOL) no existe un partido final que
-  //     defina el podio, así que hay que completar "liguilla.lugares" a
-  //     mano con el "id" de la generación en cada puesto cuando se termine
-  //     de jugar (o dejarlo en null mientras tanto).
-  //
-  // ESCONDIDAS (fórmula nueva, acordada por el consejo): ya NO se basa en
-  // "ganador de la instancia". Ahora cada instancia (ej: Almuerzo, Tarde)
-  // tiene una lista "datos" con una fila por generación que participó:
-  //   {id, participantes, porcentajeEncontrado}
-  // Con eso se calculan 2 cosas y se suman:
-  //   1) Puntos por lugar, según menor % encontrado = mejor lugar:
-  //      1° = 100pts (u 80pts para cada uno si hay empate en el 1er lugar)
-  //      2° = 60pts (si empatan, se dividen entre los empatados)
-  //      3° = 20pts (si empatan, se dividen entre los empatados)
-  //      4° en adelante: no está definido por el consejo todavía (no debería
-  //      pasar con las 3-4 generaciones actuales); el código le da 0pts y,
-  //      si llegara a pasar, hay que decidir esa regla y ajustarla aquí.
-  //   2) Puntos por participante: "puntosPorParticipante" (5) x la cantidad
-  //      de "participantes" de esa generación en esa instancia.
-  // Para agregar una instancia nueva, agrega un objeto a "instancias" con su
-  // "nombre" y su array "datos". Una generación que no participó en una
-  // instancia simplemente no aparece en su "datos" (no suma ni resta nada
-  // en esa instancia).
-  //
-  // MINI JUEGOS: lista libre, agrega uno por cada mini juego jugado con
-  // {nombre, puntos, ganador}. El "ganador" se lleva "puntos" completos;
-  // el resto de generaciones no suma nada por ese mini juego. Deja
-  // "ganador:null" si todavía no se juega.
-  //
-  // FALTAS: agrega una fila por cada falta (puntos negativos) o bono
-  // (puntos positivos). El motivo es texto libre.
-  //
-  // FOTOS: "src" puede ser una URL o una imagen en base64. Si lo dejas en
-  // null se muestra un cuadro numerado de relleno (como en el boceto).
-
   const CONFIG = {
 
-    // Bonificación por puesto general, según el PDF (no aplica a Escondidas).
-    // En juegos con llave se calcula solo, con el resultado de la final y el
-    // 3er puesto. En juegos de liguilla (como LOL) no hay podio automático,
-    // así que hay que indicarlo a mano más abajo en "liguilla.lugares".
     bonoLugares: {primero:30, segundo:20, tercero:10, cuarto:0},
 
     generaciones: [
@@ -383,7 +301,7 @@
     juegos: [
       {
         key:'lol', nombre:'League of Legends', icono:'🎮',
-        tipo:'liguilla', // no hay llaves: falta una generación completa, se juega todos contra todos
+        tipo:'liguilla', 
         puntos:{ganador:27, empate:13, perdedor:7},
         liguilla:{
           partidosPorCruce: 3,
@@ -392,8 +310,6 @@
             {a:'g2024', b:'g2023', resultados:['b','b','b']},
             {a:'g2023', b:'g2025', resultados:['a','a','a']},
           ],
-          // Solo 3 generaciones juegan LOL, así que no hay "cuarto" lugar.
-          // Ponlo tú a mano cuando se terminen los cruces (id o null).
           lugares:{primero:'g2023', segundo:'g2025', tercero:'g2024'},
         }
       },
@@ -409,8 +325,8 @@
       },
       {
         key:'quemadas', nombre:'Quemadas', icono:'🔴',
-        tipo:'liguilla', // no hay llaves: falta una generación completa, se juega todos contra todos
-        puntos:{ganador:100, empate:50, perdedor:20}, // perdedor = 20% del ganador (acuerdo consejo)
+        tipo:'liguilla', 
+        puntos:{ganador:100, empate:50, perdedor:20}, 
         liguilla:{
           partidosPorCruce: 1,
           cruces:[
@@ -424,8 +340,8 @@
       },
       {
         key:'futbol', nombre:'Fútbol', icono:'⚽',
-         tipo:'liguilla', // no hay llaves: falta una generación completa, se juega todos contra todos
-        puntos:{ganador:100, empate:50, perdedor:20}, // perdedor = 20% del ganador (acuerdo consejo)
+         tipo:'liguilla', 
+        puntos:{ganador:100, empate:50, perdedor:20}, 
         liguilla:{
           partidosPorCruce: 1,
           cruces:[
@@ -439,14 +355,12 @@
       },
       {
         key:'voleibol', nombre:'Voleibol', icono:'🏐',
-         tipo:'liguilla', // no hay llaves: falta una generación completa, se juega todos contra todos
-        puntos:{ganador:100, empate:50, perdedor:20}, // perdedor = 20% del ganador (acuerdo consejo)
+         tipo:'liguilla', 
+        puntos:{ganador:100, empate:50, perdedor:20}, 
         liguilla:{
           partidosPorCruce: 2,
           cruces:[
             {a:'g2024', b:'g2025', resultados:['b','b']},
-          
-            
           ],
           
           lugares:{primero:'g2025', segundo:'g2026'},
@@ -454,7 +368,7 @@
       },
       {
         key:'mesa', nombre:'Tenis de mesa', icono:'🏓',
-        puntos:{ganador:100, empate:50, perdedor:20}, // perdedor = 20% del ganador (acuerdo consejo)
+        puntos:{ganador:100, empate:50, perdedor:20}, 
         llave:{
           semifinal1:{a:'g2024', b:'g2025', resultado:'b'},
           semifinal2:{a:'g2026', b:'g2023', resultado:'a'},
@@ -465,10 +379,7 @@
     ],
 
     escondidas: {
-      // Puntos según el lugar que sacó cada generación en la instancia
-      // (ordenando por menor % encontrado = mejor lugar).
       puntosPorLugar: {primero:100, primeroEmpate:80, segundo:60, tercero:20},
-      // Puntos extra por cada participante de tu generación en esa instancia.
       puntosPorParticipante: 5,
       instancias: [
         {
@@ -480,9 +391,6 @@
           ]
         },
         {
-          // Solo cuenta la "primera parte" de la tarde: en la segunda parte
-          // nadie fue encontrado, así que no se registra (no da información
-          // para rankear a nadie).
           nombre:'Tarde',
           datos:[
             {id:'g2024', participantes:1, porcentajeEncontrado:0},
@@ -506,24 +414,49 @@
       {nombre:'Barra en PingPong/Tenis De mesa', puntos:30, ganador:'g2025'},
       {nombre:'Barra en PingPong/Tenis De mesa', puntos:30, ganador:'g2026'},
       {nombre:'Barra en Futbol', puntos:30, ganador:'g2025'},
-      // Ejemplo — bórralo o edítalo y agrega los que quieras:
-      // {nombre:'Trivia musical', puntos:50, ganador:'g2026'},
     ],
 
     faltas: [
-      // Ejemplo — bórralo o edítalo:
-      // {generacion:'g202x', juego:'LOL', motivo:'Insulto por chat', puntos:-10},
     ],
 
+    // AQUÍ ESTÁN LAS FOTOS CONFIGURADAS
     fotos: [
-      // Ejemplo — reemplaza src por una URL o base64:
-      // {src:'https://ejemplo.com/foto1.jpg', caption:'Apertura'},
+      {src: './fotos%20intergen2026/1.jpeg', caption: ''},
+      {src: './fotos%20intergen2026/2.jpeg', caption: ''},
+      {src: './fotos%20intergen2026/3.jpeg', caption: ''},
+      {src: './fotos%20intergen2026/4.jpeg', caption: ''},
+      {src: './fotos%20intergen2026/5.jpeg', caption: ''},
+      {src: './fotos%20intergen2026/6.jpeg', caption: ''},
+      {src: './fotos%20intergen2026/7.jpeg', caption: ''},
+      {src: './fotos%20intergen2026/8.jpeg', caption: ''},
+      {src: './fotos%20intergen2026/9.jpeg', caption: ''},
+      {src: './fotos%20intergen2026/10.jpeg', caption: ''},
+      {src: './fotos%20intergen2026/11.jpeg', caption: ''},
+      {src: './fotos%20intergen2026/12.jpeg', caption: ''},
+      {src: './fotos%20intergen2026/13.jpeg', caption: ''},
+      {src: './fotos%20intergen2026/14.jpeg', caption: ''},
+      {src: './fotos%20intergen2026/15.jpeg', caption: ''},
+      {src: './fotos%20intergen2026/16.jpeg', caption: ''},
+      {src: './fotos%20intergen2026/17.jpeg', caption: ''},
+      {src: './fotos%20intergen2026/18.jpeg', caption: ''},
+      {src: './fotos%20intergen2026/19.jpeg', caption: ''},
+      {src: './fotos%20intergen2026/20.jpeg', caption: ''},
+      {src: './fotos%20intergen2026/21.jpeg', caption: ''},
+      {src: './fotos%20intergen2026/22.jpeg', caption: ''},
+      {src: './fotos%20intergen2026/23.jpeg', caption: ''},
+      {src: './fotos%20intergen2026/24.jpeg', caption: ''},
+      {src: './fotos%20intergen2026/25.jpeg', caption: ''},
+      {src: './fotos%20intergen2026/26.jpeg', caption: ''},
+      {src: './fotos%20intergen2026/27.jpeg', caption: ''},
+      {src: './fotos%20intergen2026/28.jpeg', caption: ''},
+      {src: './fotos%20intergen2026/29.jpeg', caption: ''},
+      {src: './fotos%20intergen2026/30.jpeg', caption: ''},
+      {src: './fotos%20intergen2026/31.jpeg', caption: ''},
     ],
   };
 
   // ======================================================================
-  // A partir de aquí es solo lógica de cálculo y dibujo. No hace falta
-  // tocar nada más abajo de esta línea para usar el marcador.
+  // Lógica de cálculo y dibujo
   // ======================================================================
 
   let currentGameIndex = 0;
@@ -549,8 +482,6 @@
     if (resultado === 'empate-a' || resultado === 'empate-b' || resultado === 'empate') return {a: puntosGame.empate, b: puntosGame.empate};
     return null;
   }
-  // Dado un partido genérico (final o tercerPuesto) y los ids que ocupan
-  // los slots "a"/"b", devuelve quién ganó y quién perdió ese partido.
   function resultadoGenerico(match, idA, idB){
     if (!idA || !idB) return {ganador:null, perdedor:null};
     if (match.resultado === 'a' || match.resultado === 'empate-a') return {ganador:idA, perdedor:idB};
@@ -558,7 +489,6 @@
     return {ganador:null, perdedor:null};
   }
 
-  // Calcula el podio (1°-4°) de un juego, según su tipo.
   function calcularLugares(game){
     if (game.tipo === 'liguilla'){
       const l = game.liguilla.lugares || {};
@@ -574,11 +504,6 @@
     return {primero:rFinal.ganador, segundo:rFinal.perdedor, tercero:rTercer.ganador, cuarto:rTercer.perdedor};
   }
 
-  // Calcula el detalle y los puntos de Escondidas según la fórmula nueva:
-  // por cada instancia, ordena las generaciones por menor % encontrado
-  // (mejor lugar), reparte puntos por lugar (con reglas de empate) y suma
-  // puntos por participante. Devuelve el detalle (para pintar las tablas)
-  // y los totales acumulados por generación (para el marcador general).
   function calcularEscondidas(){
     const cfg = CONFIG.escondidas;
     const totalesPorGen = {};
@@ -590,13 +515,12 @@
       const filas = [];
       let i = 0;
       while (i < ordenado.length){
-        // Agrupamos a los que quedaron empatados en el mismo % encontrado.
         let j = i;
         while (j + 1 < ordenado.length && ordenado[j+1].porcentajeEncontrado === ordenado[i].porcentajeEncontrado){
           j++;
         }
         const empatados = ordenado.slice(i, j+1);
-        const rankIndex = i; // 0 = primer lugar, 1 = segundo, 2 = tercero...
+        const rankIndex = i;
 
         let puntosLugarPorGen;
         if (rankIndex === 0){
@@ -606,7 +530,6 @@
         } else if (rankIndex === 2){
           puntosLugarPorGen = cfg.puntosPorLugar.tercero / empatados.length;
         } else {
-          // 4to lugar en adelante: no definido todavía por el consejo.
           puntosLugarPorGen = 0;
         }
 
@@ -666,7 +589,6 @@
         if (p && terA && terB){ totals[terA] += p.a; totals[terB] += p.b; }
       }
 
-      // Bono por lugar (no aplica a Escondidas, que no está en CONFIG.juegos)
       const lugares = calcularLugares(game);
       const bono = CONFIG.bonoLugares;
       if (lugares.primero) totals[lugares.primero] += bono.primero;
@@ -687,7 +609,6 @@
     return totals;
   }
 
-  // ---------- Render: marcador general ----------
   function renderScoreboard(){
     const totals = calcularPuntajes();
     const el = document.getElementById('scoreboard');
@@ -699,7 +620,6 @@
     `).join('');
   }
 
-  // ---------- Render: bracket con líneas SVG ----------
   function box(x,y,w,h,label,sub,color,estado){
     const cls = estado === 'ganador' ? 'ganador' : (label==='Por definir' ? 'pendiente' : '');
     return `<div class="bkbox ${cls}" style="left:${x}px; top:${y}px; width:${w}px; height:${h}px; --bc:${color};">
@@ -717,7 +637,6 @@
     const b = game.llave;
     const finA = ganadorDeSemi(b.semifinal1);
     const finB = ganadorDeSemi(b.semifinal2);
-    // "final.resultado" usa 'a'/'b' genéricos que representan a finA/finB:
     const finalGanadorId = (() => {
       if (b.final.resultado === 'a' || b.final.resultado === 'empate-a') return finA;
       if (b.final.resultado === 'b' || b.final.resultado === 'empate-b') return finB;
@@ -798,7 +717,6 @@
         </div>`;
       }
 
-      // Subtotal de puntos de este cruce (solo informativo)
       let ptsA = 0, ptsB = 0;
       cruce.resultados.forEach(r => {
         const p = puntosDeMatch(r, game.puntos);
@@ -818,8 +736,6 @@
       {key:'tercero', medal:'🥉', bono:CONFIG.bonoLugares.tercero},
       {key:'cuarto',  medal:'4️⃣', bono:CONFIG.bonoLugares.cuarto},
     ];
-    // Si el juego es liguilla y solo tiene 3 generaciones en juego, no mostramos
-    // el cuarto puesto (no hay una cuarta generación participando en ese juego).
     const generacionesEnJuego = game.tipo === 'liguilla'
       ? new Set(game.liguilla.cruces.flatMap(c => [c.a, c.b]))
       : null;
@@ -864,7 +780,6 @@
     el.innerHTML = CONFIG.juegos.map((g,i) => `<span class="dot ${i===currentGameIndex?'active':''}"></span>`).join('');
   }
 
-  // ---------- Render: escondidas ----------
   function renderEscondidas(){
     const el = document.getElementById('escondidasGrid');
     const { detalleInstancias } = calcularEscondidas();
@@ -895,7 +810,6 @@
     }).join('');
   }
 
-  // ---------- Render: mini juegos ----------
   function renderMinijuegos(){
     const el = document.getElementById('minijuegosGrid');
     if (!CONFIG.minijuegos.length){
@@ -911,7 +825,6 @@
     `).join('');
   }
 
-  // ---------- Render: faltas ----------
   function renderFaltas(){
     const body = document.getElementById('faltasBody');
     const empty = document.getElementById('faltasEmpty');
@@ -931,7 +844,6 @@
     `).join('');
   }
 
-  // ---------- Render: fotos ----------
   function renderFotos(){
     const el = document.getElementById('fotosGrid');
     const fotos = CONFIG.fotos.length ? CONFIG.fotos : Array.from({length:6}, (_,i) => ({src:null, caption:'Foto ' + (i+1)}));
@@ -945,7 +857,6 @@
     `).join('');
   }
 
-  // ---------- Navegación de juegos (única interacción de la página) ----------
   document.getElementById('prevGame').addEventListener('click', () => {
     currentGameIndex = (currentGameIndex - 1 + CONFIG.juegos.length) % CONFIG.juegos.length;
     renderBracket(); renderGameDots();
