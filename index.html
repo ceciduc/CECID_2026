@@ -138,6 +138,12 @@
   .esc-card .ganadora{font-size:20px; font-family:'Teko',sans-serif;}
   .esc-card .ganadora.ninguna{color:var(--muted); font-family:'Inter',sans-serif; font-size:14px;}
   .esc-card .puntos-nota{color:var(--muted); font-size:11px; margin-top:6px;}
+  .esc-card table.esc-mini{width:100%; border-collapse:collapse; font-size:11px; margin-top:6px;}
+  .esc-card table.esc-mini th{color:var(--muted); text-align:left; padding:4px 5px; border-bottom:1px solid var(--line); font-weight:600;}
+  .esc-card table.esc-mini td{padding:4px 5px; border-bottom:1px solid var(--line); text-align:left;}
+  .esc-card table.esc-mini tr:last-child td{border-bottom:none;}
+  .esc-card table.esc-mini .num{text-align:right;}
+  .esc-card table.esc-mini tr.lugar-1 td:first-child{color:var(--gold); font-weight:600;}
 
   /* Mini juegos extra */
   .mini-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(160px,1fr)); gap:14px;}
@@ -239,12 +245,12 @@
 
   <section id="escondidas-section">
     <h2>🙈 Escondidas</h2>
-    <p class="section-sub">No usa llaves. Ganador de la instancia +100, el resto +40.</p>
+    <p class="section-sub">No usa llaves. Puntaje por % de encontrados en cada instancia (1° 100pts · empate 80pts c/u · 2° 60pts · 3° 20pts, empates en 2°/3° se dividen) + 5pts por participante.</p>
     <div class="esc-grid" id="escondidasGrid"></div>
   </section>
 
   <section id="minijuegos-section">
-    <h2>🎲 Mini juegos extra</h2>
+    <h2>🎲 Mini juegos extra / Bono por Barra </h2>
     <p class="section-sub">Cada mini juego suma sus puntos solo a la generación ganadora.</p>
     <div class="mini-grid" id="minijuegosGrid"></div>
   </section>
@@ -313,6 +319,12 @@
   //   Para agregar/quitar cruces o cambiar la cantidad de partidas, edita
   //   el array "cruces" y "partidosPorCruce" directamente.
   //
+  //   IMPORTANTE (acuerdo del consejo): en los juegos deportivos (los que
+  //   antes daban 0 por perder) ahora perder da 20% del puntaje del ganador,
+  //   igual que ya pasaba en los juegos online (LOL/Valorant). Por eso
+  //   Quemadas, Fútbol, Voleibol y Tenis de mesa ahora tienen
+  //   "perdedor:20" (20% de 100) en vez de 0.
+  //
   // BONO POR LUGAR ("bonoLugares" + "lugares" de cada juego): además de los
   // puntos por partido, el PDF da un bono por el puesto final en cada juego
   // (menos Escondidas): 1° +30, 2° +20, 3° +10, 4° +0.
@@ -323,8 +335,24 @@
   //     mano con el "id" de la generación en cada puesto cuando se termine
   //     de jugar (o dejarlo en null mientras tanto).
   //
-  // ESCONDIDAS: pon el "id" de la generación ganadora en cada instancia, o
-  // null si todavía no se juega.
+  // ESCONDIDAS (fórmula nueva, acordada por el consejo): ya NO se basa en
+  // "ganador de la instancia". Ahora cada instancia (ej: Almuerzo, Tarde)
+  // tiene una lista "datos" con una fila por generación que participó:
+  //   {id, participantes, porcentajeEncontrado}
+  // Con eso se calculan 2 cosas y se suman:
+  //   1) Puntos por lugar, según menor % encontrado = mejor lugar:
+  //      1° = 100pts (u 80pts para cada uno si hay empate en el 1er lugar)
+  //      2° = 60pts (si empatan, se dividen entre los empatados)
+  //      3° = 20pts (si empatan, se dividen entre los empatados)
+  //      4° en adelante: no está definido por el consejo todavía (no debería
+  //      pasar con las 3-4 generaciones actuales); el código le da 0pts y,
+  //      si llegara a pasar, hay que decidir esa regla y ajustarla aquí.
+  //   2) Puntos por participante: "puntosPorParticipante" (5) x la cantidad
+  //      de "participantes" de esa generación en esa instancia.
+  // Para agregar una instancia nueva, agrega un objeto a "instancias" con su
+  // "nombre" y su array "datos". Una generación que no participó en una
+  // instancia simplemente no aparece en su "datos" (no suma ni resta nada
+  // en esa instancia).
   //
   // MINI JUEGOS: lista libre, agrega uno por cada mini juego jugado con
   // {nombre, puntos, ganador}. El "ganador" se lleva "puntos" completos;
@@ -382,7 +410,7 @@
       {
         key:'quemadas', nombre:'Quemadas', icono:'🔴',
         tipo:'liguilla', // no hay llaves: falta una generación completa, se juega todos contra todos
-        puntos:{ganador:100, empate:50, perdedor:0},
+        puntos:{ganador:100, empate:50, perdedor:20}, // perdedor = 20% del ganador (acuerdo consejo)
         liguilla:{
           partidosPorCruce: 1,
           cruces:[
@@ -397,7 +425,7 @@
       {
         key:'futbol', nombre:'Fútbol', icono:'⚽',
          tipo:'liguilla', // no hay llaves: falta una generación completa, se juega todos contra todos
-        puntos:{ganador:100, empate:50, perdedor:0},
+        puntos:{ganador:100, empate:50, perdedor:20}, // perdedor = 20% del ganador (acuerdo consejo)
         liguilla:{
           partidosPorCruce: 1,
           cruces:[
@@ -412,7 +440,7 @@
       {
         key:'voleibol', nombre:'Voleibol', icono:'🏐',
          tipo:'liguilla', // no hay llaves: falta una generación completa, se juega todos contra todos
-        puntos:{ganador:100, empate:50, perdedor:0},
+        puntos:{ganador:100, empate:50, perdedor:20}, // perdedor = 20% del ganador (acuerdo consejo)
         liguilla:{
           partidosPorCruce: 2,
           cruces:[
@@ -426,7 +454,7 @@
       },
       {
         key:'mesa', nombre:'Tenis de mesa', icono:'🏓',
-        puntos:{ganador:100, empate:50, perdedor:0},
+        puntos:{ganador:100, empate:50, perdedor:20}, // perdedor = 20% del ganador (acuerdo consejo)
         llave:{
           semifinal1:{a:'g2024', b:'g2025', resultado:'b'},
           semifinal2:{a:'g2026', b:'g2023', resultado:'a'},
@@ -437,8 +465,32 @@
     ],
 
     escondidas: {
-      dia:        {ganador:'g2026'},
-      tardeNoche: {ganador:'g2024'},
+      // Puntos según el lugar que sacó cada generación en la instancia
+      // (ordenando por menor % encontrado = mejor lugar).
+      puntosPorLugar: {primero:100, primeroEmpate:80, segundo:60, tercero:20},
+      // Puntos extra por cada participante de tu generación en esa instancia.
+      puntosPorParticipante: 5,
+      instancias: [
+        {
+          nombre:'Almuerzo',
+          datos:[
+            {id:'g2024', participantes:1, porcentajeEncontrado:100},
+            {id:'g2025', participantes:9, porcentajeEncontrado:88.8},
+            {id:'g2026', participantes:4, porcentajeEncontrado:75},
+          ]
+        },
+        {
+          // Solo cuenta la "primera parte" de la tarde: en la segunda parte
+          // nadie fue encontrado, así que no se registra (no da información
+          // para rankear a nadie).
+          nombre:'Tarde',
+          datos:[
+            {id:'g2024', participantes:1, porcentajeEncontrado:0},
+            {id:'g2025', participantes:3, porcentajeEncontrado:100},
+            {id:'g2026', participantes:4, porcentajeEncontrado:25},
+          ]
+        },
+      ],
     },
 
     minijuegos: [
@@ -447,7 +499,13 @@
       {nombre:'Busqueda Miembro Cecid (Anto)', puntos:50, ganador:'g2023'},
       {nombre:'Busqueda Miembro Cecid (Gorrito1)', puntos:50, ganador:'g2026'},
       {nombre:'Busqueda Miembro Cecid (Gorrito2)', puntos:50, ganador:'g2024'},
-      {nombre:'Payas', puntos:50, ganador:'g2024'}
+      {nombre:'Payas', puntos:50, ganador:'g2024'},
+      {nombre:'Barra en Futbol', puntos:30, ganador:'g2024'},
+      {nombre:'Barra en Futbol', puntos:30, ganador:'g2025'},
+      {nombre:'Barra en Futbol', puntos:30, ganador:'g2026'},
+      {nombre:'Barra en PingPong/Tenis De mesa', puntos:30, ganador:'g2025'},
+      {nombre:'Barra en PingPong/Tenis De mesa', puntos:30, ganador:'g2026'},
+      {nombre:'Barra en Futbol', puntos:30, ganador:'g2025'},
       // Ejemplo — bórralo o edítalo y agrega los que quieras:
       // {nombre:'Trivia musical', puntos:50, ganador:'g2026'},
     ],
@@ -516,6 +574,67 @@
     return {primero:rFinal.ganador, segundo:rFinal.perdedor, tercero:rTercer.ganador, cuarto:rTercer.perdedor};
   }
 
+  // Calcula el detalle y los puntos de Escondidas según la fórmula nueva:
+  // por cada instancia, ordena las generaciones por menor % encontrado
+  // (mejor lugar), reparte puntos por lugar (con reglas de empate) y suma
+  // puntos por participante. Devuelve el detalle (para pintar las tablas)
+  // y los totales acumulados por generación (para el marcador general).
+  function calcularEscondidas(){
+    const cfg = CONFIG.escondidas;
+    const totalesPorGen = {};
+    CONFIG.generaciones.forEach(g => totalesPorGen[g.id] = 0);
+
+    const detalleInstancias = cfg.instancias.map(instancia => {
+      const ordenado = [...instancia.datos].sort((a,b) => a.porcentajeEncontrado - b.porcentajeEncontrado);
+
+      const filas = [];
+      let i = 0;
+      while (i < ordenado.length){
+        // Agrupamos a los que quedaron empatados en el mismo % encontrado.
+        let j = i;
+        while (j + 1 < ordenado.length && ordenado[j+1].porcentajeEncontrado === ordenado[i].porcentajeEncontrado){
+          j++;
+        }
+        const empatados = ordenado.slice(i, j+1);
+        const rankIndex = i; // 0 = primer lugar, 1 = segundo, 2 = tercero...
+
+        let puntosLugarPorGen;
+        if (rankIndex === 0){
+          puntosLugarPorGen = empatados.length > 1 ? cfg.puntosPorLugar.primeroEmpate : cfg.puntosPorLugar.primero;
+        } else if (rankIndex === 1){
+          puntosLugarPorGen = cfg.puntosPorLugar.segundo / empatados.length;
+        } else if (rankIndex === 2){
+          puntosLugarPorGen = cfg.puntosPorLugar.tercero / empatados.length;
+        } else {
+          // 4to lugar en adelante: no definido todavía por el consejo.
+          puntosLugarPorGen = 0;
+        }
+
+        empatados.forEach(d => {
+          const puntosParticipante = d.participantes * cfg.puntosPorParticipante;
+          const total = puntosLugarPorGen + puntosParticipante;
+          totalesPorGen[d.id] += total;
+          filas.push({
+            id: d.id,
+            lugar: rankIndex + 1,
+            empatado: empatados.length > 1,
+            porcentajeEncontrado: d.porcentajeEncontrado,
+            participantes: d.participantes,
+            puntosLugar: puntosLugarPorGen,
+            puntosParticipante,
+            total,
+          });
+        });
+
+        i = j + 1;
+      }
+
+      return {nombre: instancia.nombre, filas};
+    });
+
+    return {detalleInstancias, totalesPorGen};
+  }
+
   function calcularPuntajes(){
     const totals = {};
     CONFIG.generaciones.forEach(g => totals[g.id] = 0);
@@ -556,12 +675,8 @@
       if (lugares.cuarto) totals[lugares.cuarto] += bono.cuarto;
     });
 
-    ['dia','tardeNoche'].forEach(k => {
-      const inst = CONFIG.escondidas[k];
-      if (inst.ganador){
-        CONFIG.generaciones.forEach(g => totals[g.id] += (g.id === inst.ganador ? 100 : 40));
-      }
-    });
+    const escondidas = calcularEscondidas();
+    CONFIG.generaciones.forEach(g => totals[g.id] += escondidas.totalesPorGen[g.id]);
 
     CONFIG.minijuegos.forEach(mj => {
       if (mj.ganador) totals[mj.ganador] += mj.puntos;
@@ -752,16 +867,30 @@
   // ---------- Render: escondidas ----------
   function renderEscondidas(){
     const el = document.getElementById('escondidasGrid');
-    const items = [
-      {key:'dia', label:'Instancia Día'},
-      {key:'tardeNoche', label:'Instancia Tarde/Noche'},
-    ];
-    el.innerHTML = items.map(it => {
-      const g = CONFIG.escondidas[it.key].ganador;
+    const { detalleInstancias } = calcularEscondidas();
+    const medals = ['🥇','🥈','🥉'];
+    const fmt = (n) => Number.isInteger(n) ? String(n) : n.toFixed(1);
+
+    el.innerHTML = detalleInstancias.map(inst => {
+      const filasHtml = inst.filas.map(f => `
+        <tr class="lugar-${f.lugar}">
+          <td>${medals[f.lugar-1] || (f.lugar+'°')} ${genNombre(f.id)}${f.empatado ? ' <span style="color:var(--muted);">(empate)</span>' : ''}</td>
+          <td class="num">${fmt(f.porcentajeEncontrado)}%</td>
+          <td class="num">${f.participantes}</td>
+          <td class="num">${fmt(f.puntosLugar)}</td>
+          <td class="num">${fmt(f.puntosParticipante)}</td>
+          <td class="num" style="color:var(--gold); font-weight:600;">${fmt(f.total)}</td>
+        </tr>
+      `).join('');
+
       return `<div class="esc-card">
-        <div class="titulo">${it.label}</div>
-        <div class="ganadora ${g?'':'ninguna'}">${g ? genNombre(g) : 'NINGUNA'}</div>
-        <div class="puntos-nota">Ganador +100 · Resto +40</div>
+        <div class="titulo">${inst.nombre}</div>
+        <table class="esc-mini">
+          <thead>
+            <tr><th>Generación</th><th class="num">% enc.</th><th class="num">Part.</th><th class="num">Lugar</th><th class="num">Part.</th><th class="num">Total</th></tr>
+          </thead>
+          <tbody>${filasHtml}</tbody>
+        </table>
       </div>`;
     }).join('');
   }
